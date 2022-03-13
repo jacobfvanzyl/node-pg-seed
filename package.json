@@ -1,0 +1,33 @@
+{
+  "name": "node-pg-seed",
+  "version": "1.0.0",
+  "description": "",
+  "main": "bin/index.js",
+  "bin": {
+    "pg-seed": "./bin/index.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jacobfvanzyl/node-pg-seed.git"
+  },
+  "keywords": [
+    "pg",
+    "postgres",
+    "seed"
+  ],
+  "author": "JF van Zyl",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jacobfvanzyl/node-pg-seed/issues"
+  },
+  "homepage": "https://github.com/jacobfvanzyl/node-pg-seed#readme",
+  "dependencies": {
+    "chalk": "^5.0.1",
+    "luxon": "^2.3.1",
+    "pg": "^8.7.3",
+    "yargs": "^17.3.1"
+  }
+}
