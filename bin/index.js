@@ -6,8 +6,6 @@ const yargs = require('yargs/yargs');
 const { hideBin } = require('yargs/helpers')
 const argv = yargs(hideBin(process.argv));
 
-const chalk = require('chalk');
-
 //* Subfolders for commands
 const seed = require('./seed');
 
@@ -23,7 +21,7 @@ argv.command(
         }).positional('domain', {
             describe: "The URL of the database",
             type: "string",
-            default: 'db.fauna.com'
+            default: 'localhost'
         }).positional('port', {
             describe: "The port of the database",
             type: "string",
@@ -32,18 +30,15 @@ argv.command(
         }).positional('user', {
             describe: "The user to authenticate with",
             type: "string",
-            alias: "u",
-            default: "5432"
+            alias: "u"
         }).positional('password', {
             describe: "The port of the database",
             type: "string",
-            alias: "pwd",
-            default: "5432"
+            alias: "pwd"
         }).positional('database', {
             describe: "The port of the database",
             type: "string",
-            alias: "db",
-            default: "5432"
+            alias: "db"
         }).positional('verbose', {
             describe: "Verbose logging",
             type: "boolean",
