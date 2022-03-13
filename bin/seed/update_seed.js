@@ -4,38 +4,35 @@ const format = require('../helpers/queryObjectFormatter')
 
 let client;
 
-async function upsertRows(table, rows) {
+async function getTableSchema(tableName) {
 
-    console.info(`Upserting rows into table '${table}'`)
-    
     try {
-        for await (const row of rows) {
-        
-            const queryObj = await format(row)
-    
-            const queryValue = {
-                text:
-                    `INSERT INTO "${table}" (${queryObj.columns})
-                    VALUES (${queryObj.valueParams})
-                    ON CONFLICT (id)
-                        DO UPDATE SET ${queryObj.updateSets}
-                        RETURNING (id)
-                    `,
-                values: queryObj.values
-            }
-    
-            let { rows: response } = await client.query(queryValue)
-    
-            console.log(response[0])
-        }
+
+        const queryValue =
+            `
+            SELECT
+                column_name,
+                column_default,
+                data_type
+            FROM information_schema.columns
+            WHERE
+                table_schema = 'public'
+                AND table_name = '${tableName}'
+            `
+
+        let { rows: columns } = await client.query(queryValue)
+
+        return columns
+
     } catch (error) {
         throw error
     }
+
 }
 
 async function main(paramObj) {
 
-    console.info(`Seeding database '${paramObj.database}'`)
+    console.info(`Updating seed data at '${paramObj.target}' from database '${paramObj.database}'`)
 
     try {
 
@@ -57,21 +54,36 @@ async function main(paramObj) {
 
         let directory = ''
 
-        if (paramObj.source.endsWith('/')) {
+        if (paramObj.target.endsWith('/')) {
 
-            console.info('Source is a folder')
+            console.info('Target is a folder')
 
-            directory = paramObj.source.slice(0, -1)
-            
+            directory = paramObj.target.slice(0, -1)
+
             const files = fs.readdirSync(directory)
             console.info(files)
 
             for await (const file of files) {
-                const rows = JSON.parse(fs.readFileSync(`${directory}/${file}`))
+                const objectsArr = JSON.parse(fs.readFileSync(`${directory}/${file}`))
+
+                console.log('Before:')
+                console.table(objectsArr)
 
                 const tableName = file.replace('.json', '')
 
-                await upsertRows(tableName, rows)
+                console.info(`Updating '${tableName}' with latest DB schema:`)
+
+                const columns = await getTableSchema(tableName)
+
+                console.table(columns)
+
+                objectsArr.forEach((record, index) => {
+                    
+                    // console.log(record)
+
+                    //TODO: Upsert columns into each record and write back to array
+                })
+
             }
 
         } else if (paramObj.source.endsWith('.json')) {
@@ -83,7 +95,6 @@ async function main(paramObj) {
             console.info('Source is a tar file')
 
         }
-
 
         await client.end()
 
